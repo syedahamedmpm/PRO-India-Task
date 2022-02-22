@@ -21,17 +21,11 @@ import {
   Col,
   Button,
   ModalFooter,
-  UncontrolledTooltip,
-  TabContent, TabPane, Nav, NavItem, NavLink,
-  Spinner,
   Table
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
 import * as http from '../../api/api'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import classnames from 'classnames';
 import { Component } from "react";
 
 class ProductList extends Component{
@@ -111,7 +105,6 @@ render(){
         <>
         <Header />
         <Container className="mt--7" fluid>
-        <ToastContainer />
         <Row>
           <div className="col">
             <Card className="shadow container bg-secondary">
