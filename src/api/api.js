@@ -28,9 +28,7 @@ export function url() {
         "content-type": "application/json",
         "x-access-token": token,
       },
-      body: JSON.stringify({
-        ...body,
-      }),
+      body: JSON.stringify(body),
     });
   }
 

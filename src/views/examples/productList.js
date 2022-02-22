@@ -1,4 +1,5 @@
 import React from "react";
+import Paginating from "components/Pagination/Pagination";
 
 // reactstrap components
 import {
@@ -40,9 +41,10 @@ class ProductList extends Component{
             search:'',
             getProducts:[],
             productAddModal:false,
-            productId:'',
             productName:'',
-            availableQuantity:''
+            availableQuantity:'',
+            pageSize:100,
+            currentPage:0
           };
        
     }
@@ -72,18 +74,18 @@ class ProductList extends Component{
           this.setState({
             getProducts:data
           })
+          console.log(this.state.getProducts.length)
         })
       }
       submitProduct = () =>{
         let body={
           productName:this.state.productName,
-          availableQuantity:"SFD",
-          productId:this.state.productId
+          availableQuantity:parseInt(this.state.availableQuantity)
         }
         console.log(body)
           http
           .productAdd(body,"Product")
-          .then((resp)=>resp.json)
+          .then((resp)=>resp.json())
           .then(data =>{
             console.log(data)
               this.setState({
@@ -95,8 +97,16 @@ class ProductList extends Component{
           })
           this.getProductsList()
       }
+      handleonPageChange=(index)=>{
+        this.setState({
+          currentPage:index,
+        })
+        console.log(this.state.currentPage)
+      
+      }
 render(){
     const {getProducts,search} = this.state
+    const filterGetProducts = getProducts.filter(product=>product.productName!==null).slice(this.state.currentPage * this.state.pageSize,(this.state.currentPage + 1) * this.state.pageSize)
     return(
         <>
         <Header />
@@ -126,6 +136,7 @@ render(){
               <Row>
             <Col sm="12">
               <div className="mt-5">
+                <div className="mb-5">
                   <Row>
                       <Col sm="12" md="6" lg="6">
                       <input
@@ -138,6 +149,7 @@ render(){
                       />
                       </Col>
                   </Row>
+                  </div>
                   <Row>
                       <Col md="12">
                       <Table className="align-items-center table-flush" responsive>
@@ -149,7 +161,7 @@ render(){
                 </thead>
                 <tbody>
                     {
-                        getProducts.map(product=>(
+                        filterGetProducts.filter(product=>product.productName.toLowerCase().includes(search.toLowerCase())).map(product=>(
                             <tr>
                                 <td>{product.productName}</td>
                                 <td>{product.availableQuantity}</td>
@@ -162,6 +174,16 @@ render(){
                   </Row>
               </div>
               </Col>
+              </Row>
+              <Row>
+                <Col>
+                <Paginating
+          NoOfValuesInArray={this.state.getProducts.length}
+          pageSize={this.state.pageSize}
+          onPageChange={this.handleonPageChange}
+          currentPage={this.state.currentPage}
+          />
+                </Col>
               </Row>
       </div>  
             </CardBody> 
