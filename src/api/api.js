@@ -31,5 +31,16 @@ export function url() {
       body: JSON.stringify(body),
     });
   }
+  
+  export function orderProduct(body,url) {
+    console.log(body)
+    return fetch(baseUrl + url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  }
 
   

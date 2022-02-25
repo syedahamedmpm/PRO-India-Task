@@ -26,6 +26,9 @@ import {
 // core components
 import Header from "components/Headers/Header.js";
 import * as http from '../../api/api'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import classnames from 'classnames';
 import { Component } from "react";
 
 class ProductList extends Component{
@@ -35,8 +38,11 @@ class ProductList extends Component{
             search:'',
             getProducts:[],
             productAddModal:false,
+			      orderProductModal:false,
             productName:'',
             availableQuantity:'',
+			      productId:'',
+			      quantity:'',
             pageSize:100,
             currentPage:0
           };
@@ -47,6 +53,11 @@ class ProductList extends Component{
             productAddModal:!this.state.productAddModal
         })
       }
+	  orderProductModal = () =>{
+		  this.setState({
+            orderProductModal:!this.state.orderProductModal
+        })
+	  }
       handleOnChange = (e) =>{
           const target = e.target
           const name = target.name
@@ -98,6 +109,33 @@ class ProductList extends Component{
         console.log(this.state.currentPage)
       
       }
+	  orderProducts (productId){
+		  this.setState({
+			  productId:productId,
+			  orderProductModal:!this.state.orderProductModal
+		  })
+		  
+	  }
+	  submitOrderProduct = () =>{
+		  let body={
+          productId:this.state.productId,
+          quantity:parseInt(this.state.quantity)
+        }
+        console.log(body)
+          http
+          .orderProduct(body,"OrderProducts")
+          .then((resp)=>resp.json())
+          .then(data =>{
+            console.log(data)
+              this.setState({
+                orderProductModal:false,
+                productId:'',
+                quantity:''
+              })
+           
+          })
+          this.getProductsList()
+	  }
 render(){
     const {getProducts,search} = this.state
     const filterGetProducts = getProducts.filter(product=>product.productName!==null).slice(this.state.currentPage * this.state.pageSize,(this.state.currentPage + 1) * this.state.pageSize)
@@ -105,6 +143,7 @@ render(){
         <>
         <Header />
         <Container className="mt--7" fluid>
+        <ToastContainer />
         <Row>
           <div className="col">
             <Card className="shadow container bg-secondary">
@@ -150,6 +189,7 @@ render(){
                   <tr>
                     <th scope="col">Product Name</th>
                     <th scope="col">Available Quantity</th>
+                    <th scope="col">Order Product</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,6 +198,7 @@ render(){
                             <tr>
                                 <td>{product.productName}</td>
                                 <td>{product.availableQuantity}</td>
+								<td><Button color="primary" size="sm" onClick={()=>this.orderProducts(product.productId)}>Order Products</Button></td>
                             </tr>
                         ))
                     }
@@ -204,6 +245,28 @@ render(){
             <ModalFooter>
           <Button color="primary" onClick={this.submitProduct} >Add Product</Button>{' '}
           <Button color="secondary" onClick={this.productAddModal}>Cancel</Button>
+        </ModalFooter>
+            </Modal>
+			<Modal isOpen={this.state.orderProductModal} toggle={this.orderProductModal} className={this.className}>
+            <ModalHeader toggle={this.orderProductModal}>Order Products</ModalHeader>
+            <ModalBody className="bg-secondary shadow">
+              <Row>
+              <Col sm="12" md="12" lg="12">
+              <FormGroup>
+                            <Label for="exampleEmail">Product Id</Label>
+                            <Input type="text" name="productId" value={this.state.productId} onChange={this.handleOnChange} placeholder="Product Id" />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="exampleEmail">Quantity</Label>
+                            <Input type="text" name="quantity" value={this.state.quantity} onChange={this.handleOnChange} placeholder="Quantity" />
+                        </FormGroup>
+              </Col>
+              
+              </Row>
+            </ModalBody>
+            <ModalFooter>
+          <Button color="primary" onClick={this.submitOrderProduct} >Add Product</Button>{' '}
+          <Button color="secondary" onClick={this.orderProductModal}>Cancel</Button>
         </ModalFooter>
             </Modal>
       </>
